@@ -44,7 +44,7 @@ const resolvers = {
                     { _id: context.user._id },
                     { $addToSet: { savedBooks: bookData } },
                     { new: true }
-                ).populate(savedBooks);
+                ).populate('savedBooks');
 
                 return updatedUser;
             }
@@ -53,8 +53,17 @@ const resolvers = {
         },
         removeBook : async (parent, { bookId }, context) => {
             if(context.user) {
-                
+                const updatedUser = await User.findOneAndUpdate(
+                    {_id: context.user._id},
+                    { $pull: { savedBooks: bookId } },
+                    { new: true }
+                ).populate('savedBooks');
+
+                return updatedUser;
             }
+
+            throw newAuthenticationError('You need to be logged in!');
         }
     }
 };
+
